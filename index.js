@@ -18,6 +18,10 @@ app.post('/echo', (req, res) => {
   res.json({ received: req.body, headers: req.headers });
 });
 
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found', path: req.originalUrl });
+});
+
 app.listen(PORT, () => {
   console.log(`tps-demo listening on port ${PORT}`);
 });
