@@ -18,6 +18,13 @@ app.post('/echo', (req, res) => {
   res.json({ received: req.body, headers: req.headers });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`tps-demo listening on port ${PORT}`);
 });
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, () => {
+    console.log(`${signal} received, shutting down`);
+    server.close(() => process.exit(0));
+  });
+}
