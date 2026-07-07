@@ -13,6 +13,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy', uptime: process.uptime() });
 });
 
+app.get('/time', (req, res) => {
+  res.json({ iso: new Date().toISOString(), epoch: Date.now() });
+});
+
 // Echoes back whatever is sent — handy for verifying integrations end to end.
 app.post('/echo', (req, res) => {
   res.json({ received: req.body, headers: req.headers });
