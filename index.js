@@ -1,7 +1,14 @@
+const crypto = require('crypto');
 const express = require('express');
 
 const app = express();
 app.use(express.json());
+
+// Tag every response with a request id, reusing the caller's if provided.
+app.use((req, res, next) => {
+  res.set('X-Request-Id', req.get('X-Request-Id') || crypto.randomUUID());
+  next();
+});
 
 const PORT = process.env.PORT || 3000;
 
