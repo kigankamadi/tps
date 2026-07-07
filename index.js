@@ -9,6 +9,10 @@ app.get('/', (req, res) => {
   res.json({ name: 'tps-demo', status: 'ok' });
 });
 
+app.get('/version', (req, res) => {
+  res.json({ version: require('./package.json').version, node: process.version });
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy', uptime: process.uptime() });
 });
