@@ -1,0 +1,114 @@
+{
+  "generatedAt": "2026-07-07T09:00:00.000Z",
+  "repository": {
+    "name": "tps",
+    "url": "https://github.com/kigankamadi/tps",
+    "baseBranch": "main",
+    "headBranch": "demo/add-graceful-shutdown"
+  },
+  "pullRequest": {
+    "number": 5,
+    "title": "Add graceful shutdown on SIGINT/SIGTERM",
+    "url": "https://github.com/kigankamadi/tps/pull/5",
+    "state": "open",
+    "author": "kigankamadi",
+    "additions": 8,
+    "deletions": 1,
+    "filesChanged": 1,
+    "reviewStatus": "approved",
+    "reviewer": "cursor"
+  },
+  "summary": {
+    "headline": "Adds graceful HTTP server shutdown on SIGINT and SIGTERM signals",
+    "description": "This PR modifies the Express demo server to capture the return value of app.listen() and register process signal handlers for SIGINT and SIGTERM. When either signal is received, the server logs the signal, calls server.close() to stop accepting new connections and drain in-flight requests, then exits with code 0 once the server has fully closed.",
+    "scope": "minimal",
+    "category": "reliability",
+    "breakingChanges": false
+  },
+  "commits": [
+    {
+      "sha": "1814eb9e5635f6c2e5d0a86b625dcfc418e9d446",
+      "shortSha": "1814eb9",
+      "message": "Add graceful shutdown on SIGINT/SIGTERM",
+      "author": "kigankamadi"
+    }
+  ],
+  "filesChanged": [
+    {
+      "path": "index.js",
+      "status": "modified",
+      "additions": 8,
+      "deletions": 1,
+      "language": "javascript"
+    }
+  ],
+  "changes": [
+    {
+      "file": "index.js",
+      "type": "modification",
+      "description": "Store HTTP server instance and register graceful shutdown handlers",
+      "details": [
+        {
+          "change": "Capture server reference",
+          "before": "app.listen(PORT, () => { ... });",
+          "after": "const server = app.listen(PORT, () => { ... });",
+          "rationale": "server.close() requires a reference to the HTTP server instance returned by app.listen()"
+        },
+        {
+          "change": "Register SIGINT and SIGTERM handlers",
+          "added": "for (const signal of ['SIGINT', 'SIGTERM']) { process.on(signal, () => { console.log(`${signal} received, shutting down`); server.close(() => process.exit(0)); }); }",
+          "rationale": "SIGINT handles Ctrl+C during local development; SIGTERM is the standard signal sent by process managers and container orchestrators during restarts and deployments"
+        }
+      ]
+    }
+  ],
+  "behavioralImpact": {
+    "before": "The server process terminated immediately on SIGINT/SIGTERM without closing the HTTP server, potentially aborting in-flight requests.",
+    "after": "On SIGINT or SIGTERM, the server stops accepting new connections, waits for existing requests to complete, then exits cleanly with status code 0.",
+    "affectedEndpoints": [
+      "GET /",
+      "GET /health",
+      "POST /echo"
+    ],
+    "affectedComponents": [
+      "HTTP server lifecycle",
+      "Process signal handling"
+    ],
+    "unchanged": [
+      "All route handlers and middleware",
+      "Port configuration (PORT env var, default 3000)",
+      "package.json dependencies and scripts",
+      "README documentation"
+    ]
+  },
+  "risksAndLimitations": [
+    {
+      "severity": "low",
+      "item": "No shutdown timeout",
+      "description": "If in-flight requests hang indefinitely, server.close() will not invoke its callback and the process may not exit until forcibly killed."
+    },
+    {
+      "severity": "low",
+      "item": "No explicit connection tracking",
+      "description": "server.close() stops new connections and waits for idle keep-alive connections; long-lived connections may delay shutdown."
+    },
+    {
+      "severity": "info",
+      "item": "Duplicate handler registration",
+      "description": "If signal handlers were registered elsewhere, multiple handlers could fire; not applicable in the current single-file app."
+    }
+  ],
+  "testingRecommendations": [
+    "Start the server with npm start and send SIGTERM (kill <pid>) — verify log output and clean exit",
+    "Start the server and press Ctrl+C (SIGINT) — verify same graceful shutdown behavior",
+    "Send a request to POST /echo while simultaneously signaling shutdown — verify the request completes before exit",
+    "Confirm the process exits with code 0 after shutdown"
+  ],
+  "statistics": {
+    "totalCommits": 1,
+    "totalFilesChanged": 1,
+    "totalAdditions": 8,
+    "totalDeletions": 1,
+    "netLinesChanged": 7
+  }
+}
