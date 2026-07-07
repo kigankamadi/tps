@@ -26,5 +26,7 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
     console.log(`${signal} received, shutting down`);
     server.close(() => process.exit(0));
+    // Force exit if connections don't drain in time.
+    setTimeout(() => process.exit(1), 10_000).unref();
   });
 }
