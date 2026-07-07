@@ -1,0 +1,143 @@
+{
+  "reportVersion": "1.0",
+  "generatedAt": "2026-07-07T09:10:00Z",
+  "repository": {
+    "name": "tps",
+    "url": "https://github.com/kigankamadi/tps",
+    "owner": "kigankamadi"
+  },
+  "pullRequest": {
+    "number": 6,
+    "title": "Add X-Request-Id response header",
+    "url": "https://github.com/kigankamadi/tps/pull/6",
+    "status": "open",
+    "baseBranch": "main",
+    "headBranch": "demo/add-request-id",
+    "description": "Tags every response with an X-Request-Id header — reuses the caller's header if provided, otherwise generates a UUID. Useful for tracing requests through integrations.",
+    "authors": [
+      "WashingtonKK",
+      "Claude Fable 5"
+    ]
+  },
+  "summary": {
+    "headline": "Adds request tracing via X-Request-Id response header on all endpoints",
+    "overview": "This PR introduces Express middleware that sets an X-Request-Id response header on every HTTP response. If the incoming request already includes an X-Request-Id header, that value is echoed back; otherwise, a new UUID is generated using Node.js crypto.randomUUID(). No existing endpoints or response bodies are modified.",
+    "changeType": "feature",
+    "scope": "minimal",
+    "breakingChanges": false,
+    "newDependencies": false
+  },
+  "statistics": {
+    "commits": 1,
+    "filesChanged": 1,
+    "additions": 7,
+    "deletions": 0,
+    "netLines": 7
+  },
+  "commits": [
+    {
+      "sha": "2e21035adf41415ab91873dac05764d8a82a4c84",
+      "shortSha": "2e21035",
+      "message": "Add X-Request-Id response header",
+      "author": "WashingtonKK <washingtonkigan@gmail.com>",
+      "date": "2026-07-07T09:06:23Z",
+      "filesChanged": ["index.js"]
+    }
+  ],
+  "filesChanged": [
+    {
+      "path": "index.js",
+      "changeType": "modified",
+      "additions": 7,
+      "deletions": 0,
+      "summary": "Added crypto import and Express middleware to set X-Request-Id on all responses"
+    }
+  ],
+  "detailedChanges": [
+    {
+      "file": "index.js",
+      "category": "middleware",
+      "description": "Added require('crypto') import to support UUID generation",
+      "linesAdded": 1,
+      "impact": "low"
+    },
+    {
+      "file": "index.js",
+      "category": "middleware",
+      "description": "Added Express middleware that runs before all route handlers. Sets res header X-Request-Id to the incoming X-Request-Id header value if present, otherwise generates a new UUID via crypto.randomUUID()",
+      "linesAdded": 6,
+      "impact": "medium",
+      "affectedEndpoints": [
+        "GET /",
+        "GET /health",
+        "POST /echo"
+      ]
+    }
+  ],
+  "behavioralChanges": [
+    {
+      "area": "response-headers",
+      "before": "Responses did not include an X-Request-Id header",
+      "after": "All responses include an X-Request-Id header",
+      "details": "When a client sends X-Request-Id in the request, the same value is returned in the response. When absent, a server-generated UUID (e.g. 7505880b-e64f-4e04-86e8-4a7634f187cb) is returned."
+    },
+    {
+      "area": "request-handling",
+      "before": "No request correlation or tracing support",
+      "after": "Requests can be correlated across services using the X-Request-Id header",
+      "details": "Follows common distributed tracing conventions. Middleware is registered after express.json() and before route handlers, so it applies globally."
+    }
+  ],
+  "unaffectedAreas": [
+    "Response body content for all endpoints",
+    "Route definitions and URL paths",
+    "PORT configuration and server startup",
+    "package.json dependencies (crypto is a Node.js built-in module)",
+    "README.md documentation"
+  ],
+  "verification": {
+    "status": "passed",
+    "tests": [
+      {
+        "name": "Auto-generated request ID",
+        "endpoint": "GET /health",
+        "requestHeaders": {},
+        "expected": "Response includes X-Request-Id with a UUID value",
+        "result": "passed",
+        "observed": "X-Request-Id: 7505880b-e64f-4e04-86e8-4a7634f187cb"
+      },
+      {
+        "name": "Client-provided request ID passthrough",
+        "endpoint": "GET /health",
+        "requestHeaders": {
+          "X-Request-Id": "test-id-123"
+        },
+        "expected": "Response echoes client-provided X-Request-Id",
+        "result": "passed",
+        "observed": "X-Request-Id: test-id-123"
+      }
+    ]
+  },
+  "riskAssessment": {
+    "overallRisk": "low",
+    "items": [
+      {
+        "risk": "Header injection via client-supplied X-Request-Id",
+        "severity": "low",
+        "likelihood": "low",
+        "mitigation": "Express res.set() handles header values; consider validating format if strict UUID enforcement is needed"
+      },
+      {
+        "risk": "No documentation update in README",
+        "severity": "low",
+        "likelihood": "certain",
+        "mitigation": "Consider documenting the new header behavior for integration consumers"
+      }
+    ]
+  },
+  "recommendations": [
+    "Document the X-Request-Id header behavior in README.md for integration consumers",
+    "Consider adding automated tests to assert header presence and passthrough behavior",
+    "Optionally validate client-supplied X-Request-Id values match expected format (UUID) before echoing"
+  ]
+}
