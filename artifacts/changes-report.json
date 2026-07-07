@@ -1,0 +1,173 @@
+{
+  "reportVersion": "1.0",
+  "generatedAt": "2026-07-07T09:25:00Z",
+  "repository": {
+    "name": "tps",
+    "url": "https://github.com/kigankamadi/tps",
+    "owner": "kigankamadi"
+  },
+  "pullRequest": {
+    "number": 8,
+    "title": "Expand README with endpoint table and examples",
+    "url": "https://github.com/kigankamadi/tps/pull/8",
+    "status": "open",
+    "baseBranch": "main",
+    "headBranch": "demo/expand-readme",
+    "description": "Docs-only change: converts the endpoint list to a table, adds curl examples, and documents the repo's purpose as an integration-testing sandbox.",
+    "authors": [
+      "WashingtonKK",
+      "Claude Fable 5"
+    ]
+  },
+  "summary": {
+    "headline": "Expands README documentation with endpoint table, curl examples, and purpose statement",
+    "overview": "This PR improves the README for the tps-demo Express application by restructuring the Endpoints section into a markdown table, adding a new Examples section with ready-to-run curl commands for /health and /echo, and introducing a Purpose section that clarifies the repository's role as a public sandbox for integration testing. No application code, dependencies, or API behavior are modified.",
+    "changeType": "documentation",
+    "scope": "minimal",
+    "breakingChanges": false,
+    "newDependencies": false
+  },
+  "statistics": {
+    "commits": 1,
+    "filesChanged": 1,
+    "additions": 20,
+    "deletions": 3,
+    "netLines": 17
+  },
+  "commits": [
+    {
+      "sha": "ab7276c91937e00981dd4b1d7b8a02bdbb8faf50",
+      "shortSha": "ab7276c",
+      "message": "Expand README with endpoint table, examples, and purpose",
+      "author": "WashingtonKK <washingtonkigan@gmail.com>",
+      "date": "2026-07-07T09:21:50Z",
+      "filesChanged": ["README.md"]
+    }
+  ],
+  "filesChanged": [
+    {
+      "path": "README.md",
+      "changeType": "modified",
+      "additions": 20,
+      "deletions": 3,
+      "summary": "Restructured endpoint documentation, added curl examples, and documented repository purpose"
+    }
+  ],
+  "detailedChanges": [
+    {
+      "file": "README.md",
+      "category": "endpoints-documentation",
+      "description": "Converted the Endpoints section from a markdown bullet list to a three-column table (Method, Path, Description) for clearer scanning of available API routes",
+      "linesAdded": 5,
+      "linesRemoved": 3,
+      "impact": "low",
+      "affectedEndpoints": [
+        "GET /",
+        "GET /health",
+        "POST /echo"
+      ]
+    },
+    {
+      "file": "README.md",
+      "category": "examples",
+      "description": "Added a new Examples section with copy-paste curl commands: a GET request to /health and a POST request to /echo with JSON body and Content-Type header",
+      "linesAdded": 8,
+      "impact": "low",
+      "affectedEndpoints": [
+        "GET /health",
+        "POST /echo"
+      ]
+    },
+    {
+      "file": "README.md",
+      "category": "purpose",
+      "description": "Added a Purpose section explaining that the repository is a public sandbox for exercising integrations such as webhooks, CI checks, review bots, and pull-request workflows",
+      "linesAdded": 5,
+      "impact": "low"
+    }
+  ],
+  "behavioralChanges": [
+    {
+      "area": "application-runtime",
+      "before": "Express server serves three endpoints with existing behavior",
+      "after": "No change to application runtime behavior",
+      "details": "index.js, package.json, and all API routes remain untouched. This is a documentation-only change."
+    },
+    {
+      "area": "developer-experience",
+      "before": "README listed endpoints as bullets without usage examples or repo context",
+      "after": "README provides a structured endpoint table, runnable curl examples, and a clear statement of the repository's integration-testing purpose",
+      "details": "New contributors and integration consumers can discover endpoints faster and verify the server with provided curl commands."
+    }
+  ],
+  "unaffectedAreas": [
+    "index.js application logic and endpoints",
+    "package.json dependencies and scripts",
+    ".gitignore",
+    "API request/response behavior",
+    "Server port configuration and startup"
+  ],
+  "verification": {
+    "status": "not_run",
+    "reason": "Documentation-only change; no runtime verification required",
+    "staticReview": {
+      "status": "passed",
+      "checks": [
+        {
+          "name": "Endpoint table accuracy",
+          "result": "passed",
+          "details": "Table rows match the three routes defined in index.js: GET /, GET /health, POST /echo"
+        },
+        {
+          "name": "Curl example correctness",
+          "result": "passed",
+          "details": "Health check uses GET on port 3000; echo example includes Content-Type: application/json header and a valid JSON body"
+        },
+        {
+          "name": "Markdown formatting",
+          "result": "passed",
+          "details": "Table columns align, code fence is properly closed, and section headings follow existing README structure"
+        },
+        {
+          "name": "No code changes",
+          "result": "passed",
+          "details": "Only README.md is modified; no application or configuration files are affected"
+        }
+      ]
+    },
+    "suggestedTests": [
+      {
+        "name": "Health check example",
+        "command": "curl http://localhost:3000/health",
+        "expected": "Returns JSON with status: healthy and uptime value"
+      },
+      {
+        "name": "Echo example",
+        "command": "curl -X POST http://localhost:3000/echo -H 'Content-Type: application/json' -d '{\"hello\": \"world\"}'",
+        "expected": "Returns JSON echoing the request body and headers"
+      }
+    ]
+  },
+  "riskAssessment": {
+    "overallRisk": "none",
+    "items": [
+      {
+        "risk": "Documentation drift if endpoints change",
+        "severity": "low",
+        "likelihood": "low",
+        "mitigation": "Keep README endpoint table in sync when adding or removing routes in index.js"
+      },
+      {
+        "risk": "Examples reference default port only",
+        "severity": "low",
+        "likelihood": "certain",
+        "mitigation": "Examples use localhost:3000 which matches the default PORT; users overriding PORT must adjust curl commands accordingly"
+      }
+    ]
+  },
+  "recommendations": [
+    "Consider adding a curl example for GET / to show the basic info response",
+    "If Docker support is added (see PR #7), include container-based run instructions alongside npm start",
+    "Add a link to the repository URL or integration setup guide if one exists for external consumers"
+  ]
+}
