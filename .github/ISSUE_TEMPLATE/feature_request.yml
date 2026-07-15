@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest a new demo endpoint or behavior
+labels: [enhancement]
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should the demo app do?
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What integration scenario does this help test?

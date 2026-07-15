@@ -1,0 +1,23 @@
+name: Bug report
+description: Something in the demo app misbehaves
+labels: [bug]
+body:
+  - type: input
+    id: endpoint
+    attributes:
+      label: Endpoint
+      placeholder: GET /health
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
